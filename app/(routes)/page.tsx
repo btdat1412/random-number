@@ -1,5 +1,8 @@
+import Link from "next/link";
+
 // Components
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 import { getAllMembers } from "@/services";
 
@@ -26,6 +29,12 @@ const HomePage = async () => {
                             </CardHeader>
                         </Card>
                     ))}
+                </div>
+
+                <div>
+                    <Link href="/login">
+                        <Button>Login here</Button>
+                    </Link>
                 </div>
             </main>
         </>

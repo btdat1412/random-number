@@ -7,8 +7,6 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import ToastProvider from "@/providers/toast-provider";
 
 // Components
-import Navbar from "@/components/navbar";
-import Header from "@/components/header";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,18 +24,15 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
                     <ToastProvider />
 
-                    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-                        <Navbar />
-
-                        <div className="flex flex-col">
-                            <Header />
-
-                            <TooltipProvider>{children}</TooltipProvider>
-                        </div>
-                    </div>
+                    <TooltipProvider>{children}</TooltipProvider>
                 </ThemeProvider>
             </body>
         </html>
