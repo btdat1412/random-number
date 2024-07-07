@@ -33,7 +33,15 @@ const HomePage = async () => {
 
                 <div>
                     <Link href="/login">
-                        <Button>Login here</Button>
+                        <Button variant="secondary">Login here</Button>
+                    </Link>
+                </div>
+
+                <div>
+                    <Link href="/room">
+                        <Button size="lg" className="text-lg font-bold">
+                            All rooms
+                        </Button>
                     </Link>
                 </div>
             </main>
