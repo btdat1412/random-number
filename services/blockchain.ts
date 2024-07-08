@@ -1,6 +1,5 @@
 import  {SHA256} from 'crypto-js';
 import { ec as EC } from 'elliptic';
-import * as fs from 'fs';
 // const SHA256 = CryptoJS.SHA256;
 const ec = new EC('secp256k1');
 
@@ -164,19 +163,6 @@ class Blockchain {
         }
 
         return true;
-    }
-
-    static loadFromFile(filename: string): Blockchain {
-        const data = fs.readFileSync(filename, 'utf8');
-        const blockchainData = JSON.parse(data);
-        const blockchain = new Blockchain();
-        blockchain.chain = blockchainData.chain;
-        blockchain.difficulty = blockchainData.difficulty;
-        blockchain.pendingTransactions = blockchainData.pendingTransactions;
-        blockchain.miningReward = blockchainData.miningReward;
-
-        console.log('Blockchain loaded from file:', filename);
-        return blockchain;
     }
 }
 export { Blockchain, Transaction };
