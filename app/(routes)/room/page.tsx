@@ -1,8 +1,7 @@
 import React from "react";
 
-import AvailableRooms from "@/components/available-rooms";
+import AvailableRooms from "@/components/room/available-rooms";
 
-// Services
 import { getAllRooms } from "@/services";
 
 const AllRoomsPage = async () => {

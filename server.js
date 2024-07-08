@@ -6,9 +6,6 @@
  * @createdAt 2024-07-07 17:02
  */
 
-// import { createServer } from "node:http";
-// import next from "next";
-// import { Server } from "socket.io";
 const { createServer } = require("http");
 const next = require("next");
 const { Server } = require("socket.io");
@@ -26,7 +23,26 @@ app.prepare().then(() => {
     const io = new Server(httpServer);
 
     io.on("connection", (socket) => {
-        // ...
+        console.log(
+            "A user has connected to socket server with id:",
+            socket.id,
+        );
+
+        // Handle 'joinRoom' event
+        socket.on("joinRoom", (roomID) => {
+            socket.join(roomID);
+            console.log(`User ${socket.id} has joined room #${roomID}`);
+
+            // Broadcast to the room (excluding the sender)
+            socket
+                .to(roomID)
+                .emit("userJoined", `A new user has joined room #${roomID}`);
+        });
+
+        // Optional: Handle 'disconnect' event
+        socket.on("disconnect", () => {
+            console.log(`User ${socket.id} disconnected`);
+        });
     });
 
     httpServer

@@ -28,12 +28,20 @@ import {
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 // Services
 import { createRoom } from "@/services/action";
 
 // Assets
-import { X, Plus } from "lucide-react";
+import { X, Plus, Slash } from "lucide-react";
 
 const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
     // State to manage dialog visibility
@@ -54,6 +62,22 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
 
     return (
         <div className="flex flex-1 flex-col gap-4 lg:gap-6">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    
+                    <BreadcrumbSeparator>
+                        <Slash />
+                    </BreadcrumbSeparator>
+                    
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/room">Rooms</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
             <div className="flex items-center justify-between">
                 <h1 className="text-lg font-semibold md:text-2xl">
                     {rooms.length === 0
