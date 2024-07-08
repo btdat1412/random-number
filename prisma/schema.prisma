@@ -18,6 +18,17 @@ model TeamMember {
   name String
 }
 
+model User {
+  id         Int      @id @default(autoincrement())
+  role       String   @default("user") // user, admin
+  name       String
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+  publicKey  String?
+  privateKey String?
+}
+
 model Room {
   id Int @id @default(autoincrement())
 }

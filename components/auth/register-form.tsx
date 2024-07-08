@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -23,40 +24,54 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-    email: z.string().email({
-        message: "Invalid email address",
-    }),
-    fullName: z.string().min(1, {
+    email: z
+        .string()
+        .min(1, "Email is required")
+        .email("Invalid email address"),
+    name: z.string().min(1, {
         message: "Please enter your full name properly",
     }),
-    password: z.string().min(3, {
-        message: "Password must contain at least 3 character(s)",
-    }),
+    password: z
+        .string()
+        .min(1, "Password is required")
+        .min(3, "Password must contain at least 3 character(s)"),
 });
 
 const RegisterForm = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
-            fullName: "",
+            name: "",
             password: "",
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setIsLoading(true);
+        toast(`Registering with email: ${values.email}`);
 
-        toast(
-            `Registering with email: ${values.email}, full name: ${values.fullName}, password: ${values.password}`,
-        );
+        const response = await fetch("/api/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(values),
+        });
 
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 3000);
-    }
+        setIsLoading(false);
+
+        if (response.ok) {
+            toast.success("You have successfully registered! Let's login.");
+            router.push("/login");
+        } else {
+            toast.error("Something went wrong!");
+        }
+    };
 
     return (
         <Form {...form}>
@@ -87,7 +102,7 @@ const RegisterForm = () => {
 
                 <FormField
                     control={form.control}
-                    name="fullName"
+                    name="name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Full name</FormLabel>

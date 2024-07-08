@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -23,16 +25,20 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-    email: z.string().email({
-        message: "Invalid email address",
-    }),
-    password: z.string().min(3, {
-        message: "Password must contain at least 3 character(s)",
-    }),
+    email: z
+        .string()
+        .min(1, "Email is required")
+        .email("Invalid email address"),
+    password: z
+        .string()
+        .min(1, "Password is required")
+        .min(3, "Password must contain at least 3 character(s)"),
 });
 
 const LoginForm = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -42,17 +48,24 @@ const LoginForm = () => {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setIsLoading(true);
+        toast(`Logging in with email: ${values.email}`);
 
-        toast(
-            `Logging in with email: ${values.email}, password: ${values.password}`,
-        );
+        const signInData = await signIn("credentials", values);
+        console.log(signInData);
 
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 3000);
-    }
+        setIsLoading(false);
+
+        if (signInData?.error) {
+            toast.error(signInData.error);
+            console.log(signInData.error);
+        } else {
+            toast.success("Logged in successfully");
+            console.log("Logged in successfully");
+            router.push("/");
+        }
+    };
 
     return (
         <Form {...form}>

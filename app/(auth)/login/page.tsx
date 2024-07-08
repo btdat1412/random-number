@@ -37,18 +37,17 @@ const LoginPage = () => {
                     </div>
                 </CardHeader>
 
+                <LoginForm />
 
-                    <LoginForm />
-
-                    <div>
-                        Don&apos;t have an account?{" "}
-                        <Link
-                            href="/register"
-                            className="text-sm font-bold text-blue-500 hover:underline"
-                        >
-                            Register
-                        </Link>
-                    </div>
+                <div>
+                    Don&apos;t have an account?{" "}
+                    <Link
+                        href="/register"
+                        className="text-sm font-bold text-blue-500 hover:underline"
+                    >
+                        Register
+                    </Link>
+                </div>
             </Card>
         </div>
     );
