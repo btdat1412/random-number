@@ -4,17 +4,25 @@ import Link from "next/link";
 // Components
 import { Button } from "@/components/ui/button";
 
+// Assets
+import { ChevronLeft } from "lucide-react";
+
 const RoomPage = ({ params }: { params: { roomID: string } }) => {
     return (
-        <div className="p-4 lg:p-6">
+        <>
+            {/* TODO: add breadcrumb */}
             <p className="pb-2">
                 <Link href="/room">
-                    <Button variant="outline">Back to all rooms</Button>
+                    <Button variant="outline">
+                        <ChevronLeft className="mr-2 h-5 w-5" /> All rooms
+                    </Button>
                 </Link>
             </p>
 
-            <p>Room #{params.roomID}</p>
-        </div>
+            <h1 className="text-lg font-semibold md:text-2xl">
+                Room #{params.roomID}
+            </h1>
+        </>
     );
 };
 

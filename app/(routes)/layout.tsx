@@ -14,7 +14,7 @@ export default function MainLayout({
             <div className="flex flex-col">
                 <Header />
 
-                {children}
+                <main className="p-4 lg:p-6">{children}</main>
             </div>
         </div>
     );

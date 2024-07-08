@@ -2,11 +2,25 @@ import React from "react";
 import Link from "next/link";
 
 // Icons
-import { Dices, CircleUser, Home, LineChart, Menu, Search, Users } from "lucide-react";
+import {
+    Dices,
+    CircleUser,
+    Home,
+    LineChart,
+    Menu,
+    Search,
+    Warehouse,
+} from "lucide-react";
 
 // Components
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,11 +34,17 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ThemeToggler from "@/components/theme-toggler";
 
 const Header = () => {
+    const isLoggedIn = false;
+
     return (
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
             <Sheet>
                 <SheetTrigger asChild>
-                    <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="shrink-0 md:hidden"
+                    >
                         <Menu className="h-5 w-5" />
                         <span className="sr-only">Toggle navigation menu</span>
                     </Button>
@@ -32,23 +52,26 @@ const Header = () => {
 
                 <SheetContent side="left" className="flex flex-col">
                     <nav className="grid gap-2 text-lg font-medium">
-                        <Link href="#" className="flex items-center gap-2 text-lg font-semibold">
+                        <Link
+                            href="#"
+                            className="flex items-center gap-2 text-lg font-semibold"
+                        >
                             <Dices className="h-6 w-6" />
                             <span className="sr-only">Random Number</span>
                         </Link>
                         <Link
-                            href="#"
+                            href="/"
                             className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                         >
                             <Home className="h-5 w-5" />
-                            Dashboard
+                            Home
                         </Link>
                         <Link
-                            href="#"
+                            href="/room"
                             className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                         >
-                            <Users className="h-5 w-5" />
-                            Users
+                            <Warehouse className="h-5 w-5" />
+                            Rooms
                         </Link>
                         <Link
                             href="#"
@@ -63,7 +86,8 @@ const Header = () => {
                             <CardHeader>
                                 <CardTitle>Upgrade to Pro</CardTitle>
                                 <CardDescription>
-                                    Unlock all features and get unlimited access to our support team.
+                                    Unlock all features and get unlimited access
+                                    to our support team.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -91,27 +115,37 @@ const Header = () => {
 
             <ThemeToggler />
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="secondary" size="icon" className="rounded-full">
-                        <CircleUser className="h-5 w-5" />
-                        <span className="sr-only">Toggle user menu</span>
-                    </Button>
-                </DropdownMenuTrigger>
+            {isLoggedIn ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="secondary"
+                            size="icon"
+                            className="rounded-full"
+                        >
+                            <CircleUser className="h-5 w-5" />
+                            <span className="sr-only">Toggle user menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
 
-                    <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
 
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
-                    <DropdownMenuItem>Support</DropdownMenuItem>
+                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                        <DropdownMenuItem>Support</DropdownMenuItem>
 
-                    <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
 
-                    <DropdownMenuItem>Logout</DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                        <DropdownMenuItem>Logout</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <Link href="/login">
+                    <Button>Login</Button>
+                </Link>
+            )}
         </header>
     );
 };
