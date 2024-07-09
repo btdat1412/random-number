@@ -5,6 +5,7 @@ import "./globals.css";
 // Providers
 import { ThemeProvider } from "@/providers/theme-provider";
 import ToastProvider from "@/providers/toast-provider";
+import AuthSessionProvider from "@/providers/auth-session-provider";
 
 // Components
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,18 +24,20 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={inter.className}>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <ToastProvider />
+            <AuthSessionProvider>
+                <body className={inter.className}>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <ToastProvider />
 
-                    <TooltipProvider>{children}</TooltipProvider>
-                </ThemeProvider>
-            </body>
+                        <TooltipProvider>{children}</TooltipProvider>
+                    </ThemeProvider>
+                </body>
+            </AuthSessionProvider>
         </html>
     );
 }

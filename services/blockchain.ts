@@ -1,8 +1,7 @@
-import  {SHA256} from 'crypto-js';
-import { ec as EC } from 'elliptic';
-import * as fs from 'fs';
+import { SHA256 } from "crypto-js";
+import { ec as EC } from "elliptic";
 // const SHA256 = CryptoJS.SHA256;
-const ec = new EC('secp256k1');
+const ec = new EC("secp256k1");
 
 class Transaction {
     fromAddress: string | null;
@@ -17,17 +16,19 @@ class Transaction {
     }
 
     calculateHash(): string {
-        return SHA256(this.fromAddress + this.toAddress + this.amount).toString();
+        return SHA256(
+            this.fromAddress + this.toAddress + this.amount,
+        ).toString();
     }
 
     signTransaction(signingKey: EC.KeyPair): void {
-        if (signingKey.getPublic('hex') !== this.fromAddress) {
-            throw new Error('You cannot sign transactions for other wallets!');
+        if (signingKey.getPublic("hex") !== this.fromAddress) {
+            throw new Error("You cannot sign transactions for other wallets!");
         }
 
         const hashTx = this.calculateHash();
-        const sig = signingKey.sign(hashTx, 'base64');
-        this.signature = sig.toDER('hex');
+        const sig = signingKey.sign(hashTx, "base64");
+        this.signature = sig.toDER("hex");
     }
 
     isValid(): boolean {
@@ -36,10 +37,10 @@ class Transaction {
         }
 
         if (!this.signature || this.signature.length === 0) {
-            throw new Error('No signature in this transaction');
+            throw new Error("No signature in this transaction");
         }
 
-        const publicKey = ec.keyFromPublic(this.fromAddress, 'hex');
+        const publicKey = ec.keyFromPublic(this.fromAddress, "hex");
         return publicKey.verify(this.calculateHash(), this.signature);
     }
 }
@@ -51,7 +52,11 @@ class Block {
     hash: string;
     nonce: number;
 
-    constructor(timestamp: number, transactions: Transaction[], previousHash = '') {
+    constructor(
+        timestamp: number,
+        transactions: Transaction[],
+        previousHash = "",
+    ) {
         this.timestamp = timestamp;
         this.transactions = transactions;
         this.previousHash = previousHash;
@@ -60,11 +65,19 @@ class Block {
     }
 
     calculateHash(): string {
-        return SHA256(this.timestamp + JSON.stringify(this.transactions) + this.previousHash + this.nonce).toString();
+        return SHA256(
+            this.timestamp +
+                JSON.stringify(this.transactions) +
+                this.previousHash +
+                this.nonce,
+        ).toString();
     }
 
     mineBlock(difficulty: number): void {
-        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+        while (
+            this.hash.substring(0, difficulty) !==
+            Array(difficulty + 1).join("0")
+        ) {
             this.nonce++;
             this.hash = this.calculateHash();
         }
@@ -103,13 +116,21 @@ class Blockchain {
     }
 
     minePendingTransactions(miningRewardAddress: string): void {
-        const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
+        const rewardTx = new Transaction(
+            null,
+            miningRewardAddress,
+            this.miningReward,
+        );
         this.pendingTransactions.push(rewardTx);
 
-        let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+        let block = new Block(
+            Date.now(),
+            this.pendingTransactions,
+            this.getLatestBlock().hash,
+        );
         block.mineBlock(this.difficulty);
 
-        console.log('Mine success');
+        console.log("Mine success");
         this.chain.push(block);
 
         this.pendingTransactions = [];
@@ -117,11 +138,11 @@ class Blockchain {
 
     addTransaction(transaction: Transaction): void {
         if (!transaction.toAddress || !transaction.fromAddress) {
-            throw new Error('Transaction must include from and to address');
+            throw new Error("Transaction must include from and to address");
         }
 
         if (!transaction.isValid()) {
-            throw new Error('Cannot add invalid transaction to chain');
+            throw new Error("Cannot add invalid transaction to chain");
         }
 
         this.pendingTransactions.push(transaction);
@@ -165,19 +186,5 @@ class Blockchain {
 
         return true;
     }
-
-    static loadFromFile(filename: string): Blockchain {
-        const data = fs.readFileSync(filename, 'utf8');
-        const blockchainData = JSON.parse(data);
-        const blockchain = new Blockchain();
-        blockchain.chain = blockchainData.chain;
-        blockchain.difficulty = blockchainData.difficulty;
-        blockchain.pendingTransactions = blockchainData.pendingTransactions;
-        blockchain.miningReward = blockchainData.miningReward;
-
-        console.log('Blockchain loaded from file:', filename);
-        return blockchain;
-    }
 }
 export { Blockchain, Transaction };
-
