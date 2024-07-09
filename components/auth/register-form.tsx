@@ -69,7 +69,7 @@ const RegisterForm = () => {
             toast.success("You have successfully registered! Let's login.");
             router.push("/login");
         } else {
-            toast.error("Something went wrong!");
+            toast.error("Oops! Something went wrong. Please try again.");
         }
     };
 

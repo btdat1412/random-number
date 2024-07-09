@@ -52,17 +52,23 @@ const LoginForm = () => {
         setIsLoading(true);
         toast(`Logging in with email: ${values.email}`);
 
-        const signInData = await signIn("credentials", values);
+        const signInData = await signIn("credentials", {
+            email: values.email,
+            password: values.password,
+            redirect: false,
+        });
         console.log(signInData);
 
         setIsLoading(false);
 
         if (signInData?.error) {
-            toast.error(signInData.error);
+            toast.error('Oops! Something went wrong. Please try again.');
             console.log(signInData.error);
         } else {
             toast.success("Logged in successfully");
             console.log("Logged in successfully");
+
+            router.refresh();
             router.push("/");
         }
     };
