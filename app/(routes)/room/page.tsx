@@ -7,7 +7,7 @@ import { getAllRooms } from "@/services";
 const AllRoomsPage = async () => {
     const data = await getAllRooms();
 
-    return <AvailableRooms rooms={data.rooms} />;
+    return <AvailableRooms allRooms={data.rooms} />;
 };
 
 export default AllRoomsPage;

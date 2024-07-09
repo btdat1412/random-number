@@ -20,10 +20,15 @@ import { Separator } from "@/components/ui/separator";
 // Assets
 import { Slash } from "lucide-react";
 
+// Auth
+import { useSession } from "next-auth/react";
+
 const RoomPage = ({ params }: { params: { roomID: string } }) => {
     const [isConnected, setIsConnected] = useState(false);
     const [transport, setTransport] = useState("N/A");
     const [messages, setMessages] = useState<string[]>([]);
+
+    const { status } = useSession();
 
     useEffect(() => {
         if (socket.connected) {
@@ -62,6 +67,17 @@ const RoomPage = ({ params }: { params: { roomID: string } }) => {
             socket.off("userJoined", onUserJoined);
         };
     }, []);
+
+    if (status === "unauthenticated") {
+        return (
+            <h1 className="text-lg font-semibold md:text-2xl">
+                <Link href="/login" className="underline">
+                    Login
+                </Link>{" "}
+                to join this room.
+            </h1>
+        );
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-4 lg:gap-6">

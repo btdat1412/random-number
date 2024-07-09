@@ -16,7 +16,7 @@ const HomePage = async () => {
             <div className="flex items-center">
                 <h1 className="text-lg font-semibold md:text-2xl">
                     {session?.user
-                        ? `Welcome to the game, ${session?.user.name}!`
+                        ? `Welcome to the game, ${session?.user.role === "admin" ? "Admin" : ""} ${session?.user.name}!`
                         : "Login to start playing our game!"}
                 </h1>
             </div>

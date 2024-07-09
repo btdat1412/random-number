@@ -43,17 +43,16 @@ import { createRoom } from "@/services/action";
 // Assets
 import { X, Plus, Slash } from "lucide-react";
 
-const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
+const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
+    const [rooms, setRooms] = useState(allRooms);
     // State to manage dialog visibility
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    // State to store the newly created room ID
-    const [newRoomID, setNewRoomID] = useState("");
 
     const handleCreateRoom = async () => {
         try {
             const response = await createRoom();
 
-            setNewRoomID(response.room.id.toString());
+            setRooms([...rooms, response.room]);
             setIsDialogOpen(true);
         } catch (error) {
             toast("Failed to create room. Please try again later.");
@@ -67,11 +66,11 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/">Home</BreadcrumbLink>
                     </BreadcrumbItem>
-                    
+
                     <BreadcrumbSeparator>
                         <Slash />
                     </BreadcrumbSeparator>
-                    
+
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/room">Rooms</BreadcrumbLink>
                     </BreadcrumbItem>
@@ -95,7 +94,8 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
-                            Room #{`${newRoomID}`} created successfully
+                            Room #{`${rooms[rooms.length - 1].id}`}{" "}
+                            created successfully
                         </DialogTitle>
                     </DialogHeader>
 
@@ -108,15 +108,20 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
                     </DialogClose>
 
                     <DialogFooter>
-                        <Link href={`/room/${newRoomID}`}>
-                            <Button>Go to room #{`${newRoomID}`}</Button>
+                        <Link
+                            href={`/room/${rooms[rooms.length - 1].id}`}
+                        >
+                            <Button>
+                                Go to room #
+                                {`${rooms[rooms.length - 1].id}`}
+                            </Button>
                         </Link>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
             {rooms.length > 0 && (
-                <div className="flex flex-row flex-wrap space-x-4 rounded-lg border border-dashed p-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8">
                     {rooms.map((room) => (
                         <Link href={`/room/${room.id}`} key={room.id}>
                             <Card className="duration-200 ease-in-out hover:scale-110">
