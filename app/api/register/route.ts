@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcrypt";
+import { generateKeys } from "@/services/generateKeys";
 
 export const POST = async (req: Request) => {
     try {
@@ -24,11 +25,14 @@ export const POST = async (req: Request) => {
         }
 
         const hashedPassword = await hash(password, 10);
+        const { privateKey, publicKey } = generateKeys();
         const newUser = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
+                privateKey,
+                publicKey,
             },
         });
         const { password: newUserPassword, ...rest } = newUser;

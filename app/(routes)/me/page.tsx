@@ -20,11 +20,11 @@ const UserInfoPage = async () => {
                 </h1>
             </div>
 
-            <UserInfo />
-
-            <div className="flex flex-row space-x-4 rounded-lg border border-dashed p-4">
+            <div className="space-y-2 rounded-lg border border-dashed p-4">
                 {session?.user && <p className="">Your balance: $100</p>}
             </div>
+
+            <UserInfo />
         </div>
     );
 };
