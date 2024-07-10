@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 
+import {User } from "@/types";
 declare module "next-auth" {
     interface User {
         id: string;

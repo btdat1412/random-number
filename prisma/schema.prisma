@@ -27,8 +27,15 @@ model User {
   createdAt  DateTime @default(now())
   publicKey  String?
   privateKey String?
+
+  room Room[]
 }
 
 model Room {
-  id Int @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
+  name       String @default("")
+  minimumBet Int    @default(100)
+  createdBy  Int
+
+  user User @relation(fields: [createdBy], references: [id])
 }

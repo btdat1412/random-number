@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Room" ADD COLUMN     "minimumBet" INTEGER NOT NULL DEFAULT 100,
+ADD COLUMN     "name" TEXT NOT NULL DEFAULT 'Room#{id}';
+
+-- AddForeignKey
+ALTER TABLE "Room" ADD CONSTRAINT "Room_id_fkey" FOREIGN KEY ("id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -36,6 +36,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 // Assets
 import { X, Plus, Slash } from "lucide-react";
@@ -53,6 +55,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
     // State to manage dialog content
     const [dialogContent, setDialogContent] = useState<{
         header: React.ReactNode;
+        content: React.ReactNode;
         footer: React.ReactNode;
     }>({
         header: (
@@ -62,6 +65,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
                 </DialogTitle>
             </DialogHeader>
         ),
+        content: null,
         footer: (
             <DialogFooter>
                 <Link href="/login">
@@ -71,46 +75,114 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
         ),
     });
 
+    const [userInput, setUserInput] = useState({
+        roomName: "A room",
+        roomMinimumBet: 100,
+    });
+
     const { data, status } = useSession();
 
-    const handleCreateRoom = async () => {
+    const handleInputChange = (inputIdentifier: any, newValue: any) => {
+        setUserInput((prevState) => {
+            return {
+                ...prevState,
+                [inputIdentifier]: +newValue,
+            };
+        });
+    };
+
+    const handleOpenDialog = async () => {
         if (status === "unauthenticated") {
             setIsDialogOpen(true);
         } else {
-            try {
-                // Create a new room
-                const response = await createRoom();
-                console.log(response.room);
+            // Update the dialog content, then open the dialog
+            setDialogContent({
+                ...dialogContent,
+                header: (
+                    <DialogHeader>
+                        <DialogTitle>Create new room</DialogTitle>
+                    </DialogHeader>
+                ),
+                content: (
+                    <>
+                        <div>
+                            <Label htmlFor="roomName">Room name</Label>
+                            <Input
+                                name="roomName"
+                                type="text"
+                                value={userInput.roomName}
+                                onChange={(event) =>
+                                    handleInputChange(
+                                        "roomName",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </div>
 
-                // Update the rooms state with the new room
-                setRooms([...rooms, response.room]);
+                        <div>
+                            <Label htmlFor="roomMinimumBet">Minimum bet</Label>
+                            <Input
+                                name="roomMinimumBet"
+                                type="number"
+                                value={userInput.roomMinimumBet}
+                                onChange={(event) =>
+                                    handleInputChange(
+                                        "roomMinimumBet",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </div>
+                    </>
+                ),
+                footer: (
+                    <DialogFooter>
+                        <Button onClick={handleCreateRoom}>Create room</Button>
+                    </DialogFooter>
+                ),
+            });
 
-                // Update the dialog content, then open the dialog
-                setDialogContent({
-                    ...dialogContent,
-                    header: (
-                        <DialogHeader>
-                            <DialogTitle>
-                                Room #{`${response.room.id}`} created
-                                successfully
-                            </DialogTitle>
-                        </DialogHeader>
-                    ),
-                    footer: (
-                        <DialogFooter>
-                            <Link href={`/room/${response.room.id}`}>
-                                <Button>
-                                    Go to room #{`${response.room.id}`}
-                                </Button>
-                            </Link>
-                        </DialogFooter>
-                    ),
-                });
-                setIsDialogOpen(true);
-            } catch (error) {
-                toast("Failed to create room. Please try again later.");
-            }
+            setIsDialogOpen(true);
         }
+    };
+
+    const handleCreateRoom = async () => {
+        try {
+            // Create a new room
+            const response = await createRoom(
+                Number(data?.user.id),
+                userInput.roomName,
+                userInput.roomMinimumBet,
+            );
+            console.log(response.room);
+
+            // Update the rooms state with the new room
+            setRooms([...rooms, response.room]);
+
+            // Update the dialog content, then open the dialog
+            setDialogContent({
+                ...dialogContent,
+                header: (
+                    <DialogHeader>
+                        <DialogTitle>
+                            Room #{`${response.room.id}`} created successfully
+                        </DialogTitle>
+                    </DialogHeader>
+                ),
+                footer: (
+                    <DialogFooter>
+                        <Link href={`/room/${response.room.id}`}>
+                            <Button>Go to room #{`${response.room.id}`}</Button>
+                        </Link>
+                    </DialogFooter>
+                ),
+            });
+            setIsDialogOpen(true);
+        } catch (error) {
+            toast("Failed to create room. Please try again later.");
+        }
+        console.log(userInput);
     };
 
     return (
@@ -138,7 +210,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
                         : "Available rooms"}
                 </h1>
 
-                <Button onClick={handleCreateRoom}>
+                <Button onClick={handleOpenDialog}>
                     <Plus className="mr-2 h-5 w-5" />
                     New room
                 </Button>
@@ -146,8 +218,6 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
 
             <Dialog open={isDialogOpen}>
                 <DialogContent>
-                    {dialogContent.header}
-
                     <DialogClose
                         onClick={() => setIsDialogOpen(false)}
                         className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
@@ -156,6 +226,8 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
                         <span className="sr-only">Close</span>
                     </DialogClose>
 
+                    {dialogContent.header}
+                    {dialogContent.content}
                     {dialogContent.footer}
                 </DialogContent>
             </Dialog>
