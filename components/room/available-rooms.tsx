@@ -37,25 +37,79 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
+// Assets
+import { X, Plus, Slash } from "lucide-react";
+
 // Services
 import { createRoom } from "@/services/action";
 
-// Assets
-import { X, Plus, Slash } from "lucide-react";
+// Auth
+import { useSession } from "next-auth/react";
 
 const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
     const [rooms, setRooms] = useState(allRooms);
     // State to manage dialog visibility
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    // State to manage dialog content
+    const [dialogContent, setDialogContent] = useState<{
+        header: React.ReactNode;
+        footer: React.ReactNode;
+    }>({
+        header: (
+            <DialogHeader>
+                <DialogTitle>
+                    You have to login to create a new room!
+                </DialogTitle>
+            </DialogHeader>
+        ),
+        footer: (
+            <DialogFooter>
+                <Link href="/login">
+                    <Button>Login</Button>
+                </Link>
+            </DialogFooter>
+        ),
+    });
+
+    const { data, status } = useSession();
 
     const handleCreateRoom = async () => {
-        try {
-            const response = await createRoom();
-
-            setRooms([...rooms, response.room]);
+        if (status === "unauthenticated") {
             setIsDialogOpen(true);
-        } catch (error) {
-            toast("Failed to create room. Please try again later.");
+        } else {
+            try {
+                // Create a new room
+                const response = await createRoom();
+                console.log(response.room);
+
+                // Update the rooms state with the new room
+                setRooms([...rooms, response.room]);
+
+                // Update the dialog content, then open the dialog
+                setDialogContent({
+                    ...dialogContent,
+                    header: (
+                        <DialogHeader>
+                            <DialogTitle>
+                                Room #{`${response.room.id}`} created
+                                successfully
+                            </DialogTitle>
+                        </DialogHeader>
+                    ),
+                    footer: (
+                        <DialogFooter>
+                            <Link href={`/room/${response.room.id}`}>
+                                <Button>
+                                    Go to room #{`${response.room.id}`}
+                                </Button>
+                            </Link>
+                        </DialogFooter>
+                    ),
+                });
+                setIsDialogOpen(true);
+            } catch (error) {
+                toast("Failed to create room. Please try again later.");
+            }
         }
     };
 
@@ -92,12 +146,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
 
             <Dialog open={isDialogOpen}>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            Room #{`${rooms[rooms.length - 1].id}`}{" "}
-                            created successfully
-                        </DialogTitle>
-                    </DialogHeader>
+                    {dialogContent.header}
 
                     <DialogClose
                         onClick={() => setIsDialogOpen(false)}
@@ -107,16 +156,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
                         <span className="sr-only">Close</span>
                     </DialogClose>
 
-                    <DialogFooter>
-                        <Link
-                            href={`/room/${rooms[rooms.length - 1].id}`}
-                        >
-                            <Button>
-                                Go to room #
-                                {`${rooms[rooms.length - 1].id}`}
-                            </Button>
-                        </Link>
-                    </DialogFooter>
+                    {dialogContent.footer}
                 </DialogContent>
             </Dialog>
 
