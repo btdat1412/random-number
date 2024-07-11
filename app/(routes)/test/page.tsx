@@ -1,45 +1,27 @@
-"use client";
+import React from "react";
 
-import React, { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 
-const TestPage = () => {
-    const [isConnected, setIsConnected] = useState(false);
-    const [transport, setTransport] = useState("N/A");
+import { Blockchain } from "@/services/blockchain";
 
-    useEffect(() => {
-        if (socket.connected) {
-            onConnect();
-        }
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
-        function onConnect() {
-            setIsConnected(true);
-            setTransport(socket.io.engine.transport.name);
-
-            socket.io.engine.on("upgrade", (transport: any) => {
-                setTransport(transport.name);
-            });
-        }
-
-        function onDisconnect() {
-            setIsConnected(false);
-            setTransport("N/A");
-        }
-
-        socket.on("connect", onConnect);
-        socket.on("disconnect", onDisconnect);
-
-        return () => {
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
-        };
-    }, []);
+const TestPage = async () => {
+    const session = await getServerSession(authOptions);
+    console.log('Message from test page: ',session);
 
     return (
         <div className="p-4 lg:p-6">
-            <p>Status: {isConnected ? "connected" : "disconnected"}</p>
+            <h1 className="text-lg font-semibold md:text-2xl">
+                Feature testing route
+            </h1>
 
-            <p>Transport: {transport}</p>
+            {session?.user ? (
+                <h1 className="text-lg">Welcome back {session?.user.name}</h1>
+            ) : (
+                <h1 className="text-lg">You are unauthorized</h1>
+            )}
         </div>
     );
 };

@@ -1,14 +1,13 @@
-import Link from "next/link";
+import React from "react";
 
 // Components
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import UserInfo from "@/components/user-info";
 
 // Auth
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
-const HomePage = async () => {
+const UserInfoPage = async () => {
     const session = await getServerSession(authOptions);
 
     return (
@@ -16,15 +15,18 @@ const HomePage = async () => {
             <div className="flex items-center">
                 <h1 className="text-lg font-semibold md:text-2xl">
                     {session?.user
-                        ? `Welcome to the game, ${session?.user.name}!`
-                        : "Login to start playing our game!"}
+                        ? `${session?.user.name}`
+                        : "You are not logged in!"}
                 </h1>
             </div>
 
-            <div className="flex flex-row space-x-4 rounded-lg border border-dashed p-4">
+            <div className="space-y-2 rounded-lg border border-dashed p-4">
                 {session?.user && <p className="">Your balance: $100</p>}
             </div>
+
+            <UserInfo />
         </div>
     );
 };
-export default HomePage;
+
+export default UserInfoPage;

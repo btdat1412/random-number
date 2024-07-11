@@ -32,9 +32,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ThemeToggler from "@/components/theme-toggler";
+import LogoutHandler from "./logout-handler";
 
-const Header = () => {
-    const isLoggedIn = false;
+// Auth
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+
+const Header = async () => {
+    const session = await getServerSession(authOptions);
 
     return (
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -115,7 +120,7 @@ const Header = () => {
 
             <ThemeToggler />
 
-            {isLoggedIn ? (
+            {session?.user ? (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
@@ -129,16 +134,22 @@ const Header = () => {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                            {session?.user.name}
+                        </DropdownMenuLabel>
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                        <DropdownMenuItem>Support</DropdownMenuItem>
+                        <Link href="/me">
+                            <DropdownMenuItem>Your info</DropdownMenuItem>
+                        </Link>
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem>Logout</DropdownMenuItem>
+                        {/* <DropdownMenuItem>Log out</DropdownMenuItem> */}
+                        <DropdownMenuItem>
+                            <LogoutHandler />
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             ) : (
