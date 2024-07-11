@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
 
 // Replace this with your deployed contract address on Ganache
-const lotteryAddress: string = "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
-
+// const lotteryAddress: string = "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
+const lotteryAddress: string = process.env.LOTTERY_ADDRESS || "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
 // ABI of your Lottery contract
 const lotteryABI = [
     {
