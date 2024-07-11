@@ -76,7 +76,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
     });
 
     const [userInput, setUserInput] = useState({
-        roomName: "A room",
+        roomName: "",
         roomMinimumBet: 100,
     });
 
@@ -110,6 +110,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
                             <Input
                                 name="roomName"
                                 type="text"
+                                className="cursor-not-allowed"
                                 value={userInput.roomName}
                                 onChange={(event) =>
                                     handleInputChange(
@@ -125,6 +126,7 @@ const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
                             <Input
                                 name="roomMinimumBet"
                                 type="number"
+                                className="cursor-not-allowed"
                                 value={userInput.roomMinimumBet}
                                 onChange={(event) =>
                                     handleInputChange(

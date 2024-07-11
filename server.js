@@ -29,17 +29,27 @@ app.prepare().then(() => {
         );
 
         // Handle 'joinRoom' event
-        socket.on("joinRoom", (roomID) => {
+        socket.on("joinRoom", async ({ roomID, user }) => {
+            socket.data.user = user;
+            socket.data.roomID = roomID;
+            
             socket.join(roomID);
-            console.log(`User ${socket.id} has joined room #${roomID}`);
+            console.log(`User ${socket.data.user.id} has joined room #${socket.data.roomID}`);
 
             // Broadcast to the room (excluding the sender)
-            socket
-                .to(roomID)
-                .emit("userJoined", `A new user has joined room #${roomID}`);
+            socket.to(roomID).emit("userJoined",`User #${socket.data.user.id} has joined room #${socket.data.roomID}`);
+
+            try {
+                const sockets = await io.in(roomID).fetchSockets();
+                const socketsUserList= sockets.map((socket) => socket.data.user);
+
+                io.in(roomID).emit("socketsList", socketsUserList);
+            } catch (error) {
+                console.error("Error fetching sockets: ", error);
+            }
         });
 
-        // Optional: Handle 'disconnect' event
+        // Handle 'disconnect' event
         socket.on("disconnect", () => {
             console.log(`User ${socket.id} disconnected`);
         });
