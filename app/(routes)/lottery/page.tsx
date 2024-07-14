@@ -32,7 +32,7 @@ const Home: React.FC = () => {
     if (lotteryContract) {
       setMessage("Entering the lottery...");
       try {
-        const tx = await lotteryContract.enter({ value: ethers.parseUnits("0.011", "ether") });
+        const tx = await lotteryContract.enter({ value: ethers.parseUnits("0.2", "ether") });
         await tx.wait(); // Wait for the transaction to be mined
         setMessage("You have entered the lottery!");
       } catch (error) {
