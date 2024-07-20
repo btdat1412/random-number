@@ -39,6 +39,19 @@ const lotteryABI = [
     },
     {
         inputs: [],
+        name: "getWinner",
+        outputs: [
+            {
+                internalType: "address",
+                name: "",
+                type: "address",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
         name: "manager",
         outputs: [
             {
@@ -59,6 +72,19 @@ const lotteryABI = [
             },
         ],
         name: "players",
+        outputs: [
+            {
+                internalType: "address",
+                name: "",
+                type: "address",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "winner",
         outputs: [
             {
                 internalType: "address",

@@ -18,7 +18,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 // Assets
-import { Slash, UserCheck2Icon } from "lucide-react";
+import { Slash } from "lucide-react";
 
 // Auth
 import { useSession } from "next-auth/react";
@@ -26,12 +26,16 @@ import { useSession } from "next-auth/react";
 // Types
 import { Room, User } from "@/types";
 
+// Context
+import { ethers } from "ethers";
+import { useWallet } from "../walletContext";
+
 const RoomDetail = ({ room, owner }: { room: Room; owner: User }) => {
+    const { contract, address } = useWallet();
     const [isConnected, setIsConnected] = useState(false);
     const [transport, setTransport] = useState("N/A");
-
     const [users, setUsers] = useState<User[]>([]);
-
+    const [winner, setWinner] = useState<string | null>(null);
     const { data, status } = useSession();
 
     useEffect(() => {
@@ -39,17 +43,28 @@ const RoomDetail = ({ room, owner }: { room: Room; owner: User }) => {
             onConnect();
         }
 
-        function onConnect() {
+        async function onConnect() {
             setIsConnected(true);
             setTransport(socket.io.engine.transport.name);
 
-            // Join the room
-            if (status === "authenticated") {
+            // Join the room only if not the owner
+            if (status === "authenticated" && data?.user.id !== owner.id) {
                 socket.emit("joinRoom", {
                     roomID: room.id,
                     user: data.user,
                 });
+
+                // Enter lottery contract if user is not the owner
+                if (contract) {
+                    await enterLottery();
+                }
             }
+
+            // // Fetch the current winner
+            // if (contract) {
+            //     const currentWinner = await contract.getWinner();
+            //     setWinner(currentWinner);
+            // }
 
             socket.io.engine.on("upgrade", (transport: any) => {
                 setTransport(transport.name);
@@ -80,13 +95,60 @@ const RoomDetail = ({ room, owner }: { room: Room; owner: User }) => {
             socket.off("userJoined", onUserJoined);
             socket.off("socketsList", onUsersList);
         };
-    }, []);
+    }, [status, room.id, data?.user.id, owner.id, contract]);
 
-    const handleChooseWinner = () => {
-        const winner = users[Math.floor(Math.random() * users.length)];
-
-        alert("Winner: " + winner.name);
+    const enterLottery = async () => {
+        try {
+            if (!contract) {
+                throw new Error("Contract not initialized");
+            }
+            const tx = await contract.enter({
+                value: ethers.parseEther("0.02"),
+                gasLimit: 300000,
+            });
+            await tx.wait();
+            console.log("Entered lottery successfully:", tx);
+        } catch (error) {
+            console.error("Error entering lottery:", error);
+        }
     };
+
+    const handleChooseWinner = async () => {
+        try {
+            if (!contract) {
+                throw new Error("Contract not initialized");
+            }
+            const tx = await contract.pickWinner({
+                gasLimit: 300000,
+            });
+            await tx.wait();
+
+            // Fetch and set the winner address
+            const winnerAddress = await contract.getWinner();
+            setWinner(winnerAddress);
+            console.log("Winner picked successfully:", winnerAddress);
+            socket.emit("winnerChosen", {
+                roomID: room.id,
+                winner: winnerAddress,
+            });
+        } catch (error) {
+            console.error("Error choosing winner:", error);
+        }
+    };
+
+    useEffect(() => {
+        socket.on("winnerChosen", ({ winner }) => {
+            if (winner === address) {
+                alert("You are the winner!");
+            } else {
+                alert("You lost, better luck next time!");
+            }
+        });
+
+        return () => {
+            socket.off("winnerChosen");
+        };
+    }, [address]);
 
     if (status === "unauthenticated") {
         return (
@@ -147,6 +209,12 @@ const RoomDetail = ({ room, owner }: { room: Room; owner: User }) => {
                     <div key={index}>{user.name}</div>
                 ))}
             </div>
+
+            {winner && (
+                <div className="rounded-lg border border-dashed p-4">
+                    <p>Winner: {winner}</p>
+                </div>
+            )}
         </div>
     );
 };
