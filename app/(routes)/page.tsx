@@ -1,15 +1,13 @@
-import Link from "next/link";
-
-// Components
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+"use client";
 
 // Auth
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
+import { useWallet } from "../../components/walletContext";
 
-const HomePage = async () => {
-    const session = await getServerSession(authOptions);
+const HomePage = () => {
+    const { data: session } = useSession();
+
+    const { balance, address } = useWallet();
 
     return (
         <div className="flex flex-1 flex-col gap-4 lg:gap-6">
@@ -22,9 +20,23 @@ const HomePage = async () => {
             </div>
 
             <div className="flex flex-row space-x-4 rounded-lg border border-dashed p-4">
-                {session?.user && <p className="">Your balance: $100</p>}
+                {session?.user && (
+                    <div>
+                        {address && (
+                            <p>
+                                Connected Address: <span>{address}</span>
+                            </p>
+                        )}
+                        {balance && (
+                            <p>
+                                Balance: <span>{balance} ETH</span>
+                            </p>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
 };
+
 export default HomePage;

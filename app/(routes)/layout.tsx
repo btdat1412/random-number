@@ -1,6 +1,7 @@
 // Components
 import Navbar from "@/components/navbar";
 import Header from "@/components/header";
+import { WalletProvider } from "../../components/walletContext";
 
 export default function MainLayout({
     children,
@@ -14,7 +15,9 @@ export default function MainLayout({
             <div className="flex flex-col">
                 <Header />
 
-                <main className="p-4 lg:p-6">{children}</main>
+                <main className="p-4 lg:p-6">
+                    <WalletProvider>{children}</WalletProvider>
+                </main>
             </div>
         </div>
     );
