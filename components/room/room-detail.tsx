@@ -54,17 +54,12 @@ const RoomDetail = ({ room, owner }: { room: Room; owner: User }) => {
                     user: data.user,
                 });
 
-                // Enter lottery contract if user is not the owner
-                if (contract) {
+                const usersList = await getUserList();
+
+                if (contract && !usersList.includes(address)) {
                     await enterLottery();
                 }
             }
-
-            // // Fetch the current winner
-            // if (contract) {
-            //     const currentWinner = await contract.getWinner();
-            //     setWinner(currentWinner);
-            // }
 
             socket.io.engine.on("upgrade", (transport: any) => {
                 setTransport(transport.name);
@@ -96,6 +91,21 @@ const RoomDetail = ({ room, owner }: { room: Room; owner: User }) => {
             socket.off("socketsList", onUsersList);
         };
     }, [status, room.id, data?.user.id, owner.id, contract]);
+
+    useEffect(() => {
+        console.log("userList", users);
+    }, [users]);
+
+    const getUserList = async () => {
+        try {
+            if (!contract) {
+                throw new Error("Contract not initialized");
+            }
+            return await contract.getPlayers();
+        } catch (error) {
+            console.error("Error getting users list:", error);
+        }
+    };
 
     const enterLottery = async () => {
         try {
