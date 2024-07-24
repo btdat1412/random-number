@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcrypt";
-import { generateKeys } from "@/services/generateKeys";
+import { generateKeys } from "@/services/generate-keys";
 
 export const POST = async (req: Request) => {
     try {

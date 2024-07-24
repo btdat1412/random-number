@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
 
-const lotteryAddress: string = process.env.NEXT_PUBLIC_LOTTERY_ADDRESS || "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
+const lotteryAddress: string =
+    process.env.NEXT_PUBLIC_LOTTERY_ADDRESS ||
+    "0xf8b4E7cEC95E648Ab68F5732F12b1d47f4Ec29E4";
 
 const lotteryABI = [
     {
@@ -30,6 +32,19 @@ const lotteryABI = [
                 internalType: "address[]",
                 name: "",
                 type: "address[]",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "getWinner",
+        outputs: [
+            {
+                internalType: "address",
+                name: "",
+                type: "address",
             },
         ],
         stateMutability: "view",
@@ -67,15 +82,32 @@ const lotteryABI = [
         stateMutability: "view",
         type: "function",
     },
+    {
+        inputs: [],
+        name: "winner",
+        outputs: [
+            {
+                internalType: "address",
+                name: "",
+                type: "address",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
 ];
 
 async function initializeContract(signer: ethers.Signer) {
     try {
-        const lotteryContract = new ethers.Contract(lotteryAddress, lotteryABI, signer);
+        const lotteryContract = new ethers.Contract(
+            lotteryAddress,
+            lotteryABI,
+            signer,
+        );
         console.log("lotteryContract initialized", lotteryContract);
 
         return lotteryContract;
-    } catch (error: any) { 
+    } catch (error: any) {
         console.error("Error initializing contract: ", error);
         throw error;
     }

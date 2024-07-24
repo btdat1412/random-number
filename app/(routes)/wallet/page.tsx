@@ -22,6 +22,7 @@ export default function Home() {
                 setBalance(ethers.formatEther(balance));
 
                 const lotteryContract = await initializeContract(signer);
+
                 setContract(lotteryContract);
             } catch (error) {
                 console.error("Error loading wallet: ", error);
@@ -45,7 +46,8 @@ export default function Home() {
         if (contract) {
             try {
                 const tx = await contract.enter({
-                    value: ethers.parseEther("0.01"), // Amount to enter the lottery
+                    value: ethers.parseEther("2"),
+                    gasLimit: 300000,
                 });
                 await tx.wait();
                 alert("Entered the lottery successfully!");
@@ -99,7 +101,7 @@ export default function Home() {
             <p className="mb-4 text-xl font-semibold">
                 Manager: <span className="text-black">{manager}</span>
             </p>
-            <div className="flex gap-6 mt-4">
+            <div className="mt-4 flex gap-6">
                 <button
                     onClick={enterLottery}
                     className="mb-2 rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-700"

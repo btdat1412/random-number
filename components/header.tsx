@@ -2,15 +2,7 @@ import React from "react";
 import Link from "next/link";
 
 // Icons
-import {
-    Dices,
-    CircleUser,
-    Home,
-    LineChart,
-    Menu,
-    Search,
-    Warehouse,
-} from "lucide-react";
+import { Dices, CircleUser, Menu, Search } from "lucide-react";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -33,6 +25,8 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ThemeToggler from "@/components/theme-toggler";
 import LogoutHandler from "./logout-handler";
+
+import { navLinks } from "@/lib/navLinks";
 
 // Auth
 import { authOptions } from "@/lib/auth";
@@ -59,33 +53,24 @@ const Header = async () => {
                     <nav className="grid gap-2 text-lg font-medium">
                         <Link
                             href="#"
-                            className="flex items-center gap-2 text-lg font-semibold"
+                            className="mb-4 flex items-center gap-2 text-lg font-semibold"
                         >
-                            <Dices className="h-6 w-6" />
+                            <Dices className="h-8 w-8" />
                             <span className="sr-only">Random Number</span>
                         </Link>
-                        <Link
-                            href="/"
-                            className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                        >
-                            <Home className="h-5 w-5" />
-                            Home
-                        </Link>
-                        <Link
-                            href="/room"
-                            className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                        >
-                            <Warehouse className="h-5 w-5" />
-                            Rooms
-                        </Link>
-                        <Link
-                            href="#"
-                            className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                        >
-                            <LineChart className="h-5 w-5" />
-                            Analytics
-                        </Link>
+
+                        {navLinks.map(({ href, label, Icon }) => (
+                            <Link
+                                key={label}
+                                href={href}
+                                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                            >
+                                <Icon className="h-4 w-4" />
+                                {label}
+                            </Link>
+                        ))}
                     </nav>
+
                     <div className="mt-auto">
                         <Card>
                             <CardHeader>
@@ -135,7 +120,8 @@ const Header = async () => {
 
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>
-                            {session?.user.name}
+                            {session?.user.name}{" "}
+                            {session?.user.role === "admin" ? " - Admin" : ""}
                         </DropdownMenuLabel>
 
                         <DropdownMenuSeparator />
@@ -146,7 +132,6 @@ const Header = async () => {
 
                         <DropdownMenuSeparator />
 
-                        {/* <DropdownMenuItem>Log out</DropdownMenuItem> */}
                         <DropdownMenuItem>
                             <LogoutHandler />
                         </DropdownMenuItem>

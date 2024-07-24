@@ -33,7 +33,7 @@ const UserInfo = () => {
                         </CardTitle>
 
                         <CardDescription>
-                            You can share this key to people
+                            This is your wallet address, you are free to share it
                         </CardDescription>
                     </CardHeader>
 

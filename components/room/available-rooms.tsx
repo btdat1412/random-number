@@ -36,28 +36,155 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-
-// Services
-import { createRoom } from "@/services/action";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 // Assets
 import { X, Plus, Slash } from "lucide-react";
 
-const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
+// Services
+import { createRoom } from "@/services/action";
+
+// Auth
+import { useSession } from "next-auth/react";
+
+const AvailableRooms = ({ allRooms }: { allRooms: Room[] }) => {
+    const [rooms, setRooms] = useState(allRooms);
     // State to manage dialog visibility
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    // State to store the newly created room ID
-    const [newRoomID, setNewRoomID] = useState("");
+    // State to manage dialog content
+    const [dialogContent, setDialogContent] = useState<{
+        header: React.ReactNode;
+        content: React.ReactNode;
+        footer: React.ReactNode;
+    }>({
+        header: (
+            <DialogHeader>
+                <DialogTitle>
+                    You have to login to create a new room!
+                </DialogTitle>
+            </DialogHeader>
+        ),
+        content: null,
+        footer: (
+            <DialogFooter>
+                <Link href="/login">
+                    <Button>Login</Button>
+                </Link>
+            </DialogFooter>
+        ),
+    });
+
+    const [userInput, setUserInput] = useState({
+        roomName: "",
+        roomMinimumBet: 100,
+    });
+
+    const { data, status } = useSession();
+
+    const handleInputChange = (inputIdentifier: any, newValue: any) => {
+        setUserInput((prevState) => {
+            return {
+                ...prevState,
+                [inputIdentifier]: +newValue,
+            };
+        });
+    };
+
+    const handleOpenDialog = async () => {
+        if (status === "unauthenticated") {
+            setIsDialogOpen(true);
+        } else {
+            // Update the dialog content, then open the dialog
+            setDialogContent({
+                ...dialogContent,
+                header: (
+                    <DialogHeader>
+                        <DialogTitle>Create new room</DialogTitle>
+                    </DialogHeader>
+                ),
+                content: (
+                    <>
+                        <div>
+                            <Label htmlFor="roomName">Room name</Label>
+                            <Input
+                                name="roomName"
+                                type="text"
+                                className="cursor-not-allowed"
+                                value={userInput.roomName}
+                                onChange={(event) =>
+                                    handleInputChange(
+                                        "roomName",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="roomMinimumBet">Minimum bet</Label>
+                            <Input
+                                name="roomMinimumBet"
+                                type="number"
+                                className="cursor-not-allowed"
+                                value={userInput.roomMinimumBet}
+                                onChange={(event) =>
+                                    handleInputChange(
+                                        "roomMinimumBet",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </div>
+                    </>
+                ),
+                footer: (
+                    <DialogFooter>
+                        <Button onClick={handleCreateRoom}>Create room</Button>
+                    </DialogFooter>
+                ),
+            });
+
+            setIsDialogOpen(true);
+        }
+    };
 
     const handleCreateRoom = async () => {
         try {
-            const response = await createRoom();
+            // Create a new room
+            const response = await createRoom(
+                Number(data?.user.id),
+                userInput.roomName,
+                userInput.roomMinimumBet,
+            );
+            console.log(response.room);
 
-            setNewRoomID(response.room.id.toString());
+            // Update the rooms state with the new room
+            setRooms([...rooms, response.room]);
+
+            // Update the dialog content, then open the dialog
+            setDialogContent({
+                ...dialogContent,
+                header: (
+                    <DialogHeader>
+                        <DialogTitle>
+                            Room #{`${response.room.id}`} created successfully
+                        </DialogTitle>
+                    </DialogHeader>
+                ),
+                footer: (
+                    <DialogFooter>
+                        <Link href={`/room/${response.room.id}`}>
+                            <Button>Go to room #{`${response.room.id}`}</Button>
+                        </Link>
+                    </DialogFooter>
+                ),
+            });
             setIsDialogOpen(true);
         } catch (error) {
             toast("Failed to create room. Please try again later.");
         }
+        console.log(userInput);
     };
 
     return (
@@ -67,11 +194,11 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/">Home</BreadcrumbLink>
                     </BreadcrumbItem>
-                    
+
                     <BreadcrumbSeparator>
                         <Slash />
                     </BreadcrumbSeparator>
-                    
+
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/room">Rooms</BreadcrumbLink>
                     </BreadcrumbItem>
@@ -85,7 +212,7 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
                         : "Available rooms"}
                 </h1>
 
-                <Button onClick={handleCreateRoom}>
+                <Button onClick={handleOpenDialog}>
                     <Plus className="mr-2 h-5 w-5" />
                     New room
                 </Button>
@@ -93,12 +220,6 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
 
             <Dialog open={isDialogOpen}>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            Room #{`${newRoomID}`} created successfully
-                        </DialogTitle>
-                    </DialogHeader>
-
                     <DialogClose
                         onClick={() => setIsDialogOpen(false)}
                         className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
@@ -107,16 +228,14 @@ const AvailableRooms = ({ rooms }: { rooms: Room[] }) => {
                         <span className="sr-only">Close</span>
                     </DialogClose>
 
-                    <DialogFooter>
-                        <Link href={`/room/${newRoomID}`}>
-                            <Button>Go to room #{`${newRoomID}`}</Button>
-                        </Link>
-                    </DialogFooter>
+                    {dialogContent.header}
+                    {dialogContent.content}
+                    {dialogContent.footer}
                 </DialogContent>
             </Dialog>
 
             {rooms.length > 0 && (
-                <div className="flex flex-row flex-wrap space-x-4 rounded-lg border border-dashed p-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8">
                     {rooms.map((room) => (
                         <Link href={`/room/${room.id}`} key={room.id}>
                             <Card className="duration-200 ease-in-out hover:scale-110">

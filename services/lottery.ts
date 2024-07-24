@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 // Replace this with your deployed contract address on Ganache
 // const lotteryAddress: string = "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
-const lotteryAddress: string = process.env.LOTTERY_ADDRESS || "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
+const lotteryAddress: string = process.env.NEXT_PUBLIC_LOTTERY_ADDRESS || "0x2d33fd485214d621C4398C4e8613B5b9aBF125b1";
 // ABI of your Lottery contract
 const lotteryABI = [
     {
@@ -81,7 +81,7 @@ async function initializeContract() {
         provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 
         // Use one of Ganache's default accounts
-        const privateKey = "0x73d12900ce553f2a7d57850063e2cb868c7f8c0ce404e60c52296fd7ca30f3c3";
+        const privateKey = "0x8f2a916dc1ab26c3679d908954238c6ef516a17d41ba7d6f3abd6a4692214d80";
         signer = new ethers.Wallet(privateKey, provider);
 
         // Initialize the contract

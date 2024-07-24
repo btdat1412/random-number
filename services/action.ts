@@ -1,13 +1,25 @@
 "use server";
+
 import { prisma } from "@/lib/prisma";
 
-// Parameter: id (type: number)
-export const createRoom = async () => {
-    const room = await prisma.room.create({
-        // data: { id: id },
+import { Room } from "@/types";
+
+export const createRoom = async (
+    authorID: any,
+    name?: string,
+    minimumBet?: number,
+) => {
+    const user = await prisma.user.findUniqueOrThrow({
+        where: { id: authorID },
     });
 
-    return {
-        room,
-    };
+    const room = await prisma.room.create({
+        data: {
+            createdBy: user.id,
+            name: name || undefined,
+            minimumBet: minimumBet || undefined,
+        },
+    });
+
+    return { room };
 };
